@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TrialFusion Clinical Outcome Predictor</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">TrialFusion</p>
+          <h1>Predict clinical trial outcomes with ML</h1>
+        </div>
+        <form class="search" id="predict-form">
+          <input id="query" name="query" autocomplete="off" value="NCT03887455" placeholder="Search drug or NCT ID" />
+          <button type="submit">Predict</button>
+        </form>
+      </header>
+
+      <section class="top-card">
+        <div class="trial-summary">
+          <div class="title-row">
+            <div>
+              <span>Drug</span>
+              <strong id="trial-drug">Lecanemab IV</strong>
+            </div>
+            <button id="copy-summary" type="button">Copy summary</button>
+          </div>
+          <dl class="summary-grid">
+            <div><dt>NCT ID</dt><dd id="trial-nct">NCT03887455</dd></div>
+            <div><dt>Status</dt><dd id="trial-status">Active Not Recruiting</dd></div>
+            <div><dt>Sponsor</dt><dd id="trial-sponsor">Eisai Inc.</dd></div>
+            <div><dt>Phase</dt><dd id="trial-phase">Phase 3</dd></div>
+            <div><dt>Indication</dt><dd id="trial-condition">Early Alzheimer's Disease</dd></div>
+          </dl>
+        </div>
+
+        <div class="prediction-panel">
+          <div class="prediction-number">
+            <strong id="result-label">--%</strong>
+            <span id="confidence">LOW CONF</span>
+          </div>
+          <div class="meter"><div id="meter-fill"></div></div>
+          <div class="badges">
+            <span>ML Live</span>
+            <span id="phase-delta">Phase avg -- · Delta --</span>
+          </div>
+          <ol class="timeline" aria-label="clinical development path">
+            <li data-phase="Phase 1">Phase 1</li>
+            <li data-phase="Phase 2">Phase 2</li>
+            <li data-phase="Phase 3" class="active">Phase 3</li>
+            <li data-phase="NDA/BLA">NDA/BLA</li>
+            <li data-phase="Approval">Approval</li>
+          </ol>
+          <details class="why-box">
+            <summary>Why was this percentage calculated?</summary>
+            <div id="contributions" class="contributions"></div>
+            <p id="method"></p>
+            <p id="model-note" class="model-note"></p>
+          </details>
+        </div>
+      </section>
+
+      <p class="status" id="status">Checking model status...</p>
+
+      <section class="report-section" id="score-explanation">
+        <div class="section-heading">
+          <div>
+            <span>SE</span>
+            <h2>Score Explanation</h2>
+          </div>
+          <p>The system returns top drivers, comparable historical trials, confidence, missing data, and review flags.</p>
+        </div>
+        <div class="score-grid">
+          <div class="panel">
+            <h3>Top Drivers</h3>
+            <div id="top-drivers" class="driver-list"></div>
+          </div>
+          <div class="panel">
+            <h3>Confidence</h3>
+            <div id="confidence-detail" class="confidence-detail"></div>
+          </div>
+          <div class="panel span-two">
+            <h3>Comparable Historical Trials</h3>
+            <div class="mini-table-wrap">
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>NCT ID</th>
+                    <th>Title</th>
+                    <th>Phase</th>
+                    <th>Enrollment</th>
+                    <th>Historical Outcome</th>
+                  </tr>
+                </thead>
+                <tbody id="comparable-rows"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Missing Data</h3>
+            <div id="missing-data" class="pill-list"></div>
+          </div>
+          <div class="panel">
+            <h3>Review Flags</h3>
+            <div id="review-flags" class="flag-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="report-section" id="data-model">
+        <div class="section-heading">
+          <div>
+            <span>1</span>
+            <h2>Data and Model</h2>
+          </div>
+          <p>Data from ClinicalTrials.gov</p>
+        </div>
+        <div class="panel">
+          <h3>Raw Data from ClinicalTrials.gov</h3>
+          <p class="section-note">This is the actual data scraped from CT.gov that feeds into the model.</p>
+          <div id="raw-data" class="raw-grid"></div>
+        </div>
+        <div class="panel">
+          <h3>Model Input Features</h3>
+          <div id="features" class="features"></div>
+        </div>
+      </section>
+
+      <section class="report-section" id="associated-trials">
+        <div class="section-heading">
+          <div>
+            <span>2</span>
+            <h2>All Associated Trials</h2>
+          </div>
+          <p id="associated-meta">Total: 1 · Phases: Phase 3</p>
+        </div>
+        <div class="panel table-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Phase</th>
+                <th>NCT ID</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Enrollment</th>
+                <th>Start</th>
+              </tr>
+            </thead>
+            <tbody id="associated-rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="report-section" id="competition">
+        <div class="section-heading">
+          <div>
+            <span>3</span>
+            <h2 id="competition-title">Competitive Landscape</h2>
+          </div>
+          <p id="competition-count">0 trials</p>
+        </div>
+        <div class="panel table-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Drug</th>
+                <th>Sponsor</th>
+                <th>Phase</th>
+                <th>Status</th>
+                <th>NCT ID</th>
+              </tr>
+            </thead>
+            <tbody id="competition-rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="report-section" id="risk">
+        <div class="section-heading">
+          <div>
+            <span>4</span>
+            <h2>Risk Assessment</h2>
+          </div>
+          <p id="risk-overall">Low Risk</p>
+        </div>
+        <div class="risk-grid">
+          <div class="panel">
+            <div id="risk-factors" class="risk-list"></div>
+          </div>
+          <div class="panel">
+            <h3>Quick Stats vs. Successful Trials</h3>
+            <div id="quick-stats" class="quick-stats"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
